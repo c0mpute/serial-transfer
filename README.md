@@ -16,41 +16,28 @@ fail.
 serial-transfer.py [-h] [-V] {write,read} ...
 
 serial-transfer.py read [-h] [-b] [-r RATE] [-i INPUT] [-o OUTPUT] dev
-
 positional arguments:
-  dev                   Path to serial device
-  
+dev                   Path to serial device
 optional arguments:
-  -h, --help            show this help message and exit
-  -b, --base64          Use base64 encoding (smaller overhead, might not work
-                        on all systems)
-  -r RATE, --rate RATE  Baud rate [Default: 115200]
-  -i INPUT, --input INPUT
-                        Input file/directory path (on target system)
-  -o OUTPUT, --output OUTPUT
-                        Output file/directory path (on local host)
+-h, --help            show this help message and exit
+-b, --base64          Use base64 encoding (smaller overhead, might not work on all systems)
+-r RATE, --rate RATE  Baud rate [Default: 115200]
+-i INPUT, --input INPUT Input file/directory path (on target system)
+-o OUTPUT, --output OUTPUT Output file/directory path (on local host)
 
 serial-transfer.py write [-h] [-b] [-r RATE] [-i INPUT] [-o OUTPUT] [-c CHUNK_SIZE] [-p PERM] dev
-
 positional arguments:
   dev                   Path to serial device
-
 optional arguments:
-  -h, --help            show this help message and exit
-  -b, --base64          Use base64 encoding (smaller overhead, might not work
-                        on all systems)
-  -r RATE, --rate RATE  Baud rate [Default: 115200]
-  -i INPUT, --input INPUT
-                        Input file/directory path (on local host)
-  -o OUTPUT, --output OUTPUT
-                        Output file/directory path (on target system)
-                        [Default: /tmp]
-  -c CHUNK_SIZE, --chunk-size CHUNK_SIZE
-                        Transfer chunk size (in bytes) [Default: 768]
-  -p PERM, --perm PERM  Octal permissions [Default: 644]
+-h, --help            show this help message and exit
+-b, --base64          Use base64 encoding (smaller overhead, might not work on all systems)
+-r RATE, --rate RATE  Baud rate [Default: 115200]
+-i INPUT, --input INPUT Input file/directory path (on local host)
+-o OUTPUT, --output OUTPUT Output file/directory path (on target system) [Default: /tmp]
+-c CHUNK_SIZE, --chunk-size CHUNK_SIZE Transfer chunk size (in bytes) [Default: 768]
+-p PERM, --perm PERM  Octal permissions [Default: 644]
   
 **NOTE:** serial-transfer will preserve directory structure for reading/writing files. 
-
 Example:
 serial-transfer.py read -b -r 115200 -i /etc/shadow -o /tmp 
 File saved to /tmp/etc/shadow
