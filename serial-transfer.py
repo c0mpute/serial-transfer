@@ -158,7 +158,7 @@ def write_file(ser, lpath, rpath, chunk_size=DEFAULT_CHUNK_SIZE, perm='644', bas
             enc_str = encode_hex(file.read())
         file.close()
     arr = textwrap.wrap(enc_str, chunk_size)
-    print("[+] Injecting binary...")
+    print("[+] Writing file %s to %s..." % (lpath, rpath))
     while True:
         write_size = write_enc(ser, arr, rpath, chunk_size, base64)
         if write_size == file_size: break
@@ -166,23 +166,23 @@ def write_file(ser, lpath, rpath, chunk_size=DEFAULT_CHUNK_SIZE, perm='644', bas
             print("[+] Could not determine file size on target device... Continuing without size validation")
             break
         print("[+] File size not matching...Written file size: %d...Actual file size: %d" % (write_size, file_size))
-        print("[+] Retrying binary injection...")
+        print("[+] Retrying file write...")
         cmd = "rm -f %s" % rpath
         exec_cmd(ser, cmd)
-    print("[+] Setting binary permissions...")
+    print("[+] Setting file permissions...")
     cmd = "chmod %s %s" % (perm, rpath)
     ret = exec_cmd(ser, cmd)
     if "Permission denied" in ret:
         print("[+] Setting permissions failed. Permission denied")
         return 0
     elif cmd in ret:
-        print("[+] Executable permissions set")
+        print("[+] File permissions set")
         return 1
     else:
         print("[+] Setting permissions failed with unknown error")
         return 0
 
-def write_files(ser, lpath, rpath, chunk_size=DEFAULT_CHUNK_SIZE, perm='644', base64=True):
+def write_files(ser, lpath, rpath, chunk_size=DEFAULT_CHUNK_SIZE, perm='644', base64=True, nodirstruct=False):
     if os.path.exists(lpath) and base64:
         print("[+] Transferring base64 decode script...")
         if write_file(ser, DEFAULT_LPATH_B64D, DEFAULT_RPATH_B64D, chunk_size, '777', False):
@@ -196,7 +196,10 @@ def write_files(ser, lpath, rpath, chunk_size=DEFAULT_CHUNK_SIZE, perm='644', ba
         for(subdir, dirs, files) in walk(lpath):
             for f in files:
                 local_path = subdir + os.sep + f
-                remote_path = rpath + os.sep + local_path
+                if nodirstruct:
+                    remote_path = rpath
+                else:
+                    remote_path = rpath + os.sep + local_path
                 write_file(ser, local_path, remote_path, chunk_size, perm, base64)
     elif os.path.isfile:
         write_file(ser, lpath, rpath, chunk_size, perm, base64)
@@ -279,7 +282,7 @@ def parse_write(args):
     ser.flush()
     ser.nonblocking()
     sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser, buffer_size=INPUT_BUFFER), encoding='latin1')
-    return write_files(sio, args.input, args.output, args.chunk-size, args.perm, args.base64)
+    return write_files(sio, args.input, args.output, args.chunk-size, args.perm, args.base64, args.nodirstruct)
 
 def parse_read(args):
     if not args.input:
@@ -301,6 +304,7 @@ def main():
     write_parser = subparsers.add_parser('write', help='Write files to target system')
     write_parser.add_argument('dev', help='Path to serial device')
     write_parser.add_argument('-b', '--base64', help='Use base64 encoding (smaller overhead, might not work on all systems)', action='store_true')
+    write_parser.add_argument('-d', '--nodirstruct', help='Do not keep directory structure', action='store_true')
     write_parser.add_argument('-r', '--rate', help='Baud rate\t[Default: %d]' % DEFAULT_BAUD_RATE, default=DEFAULT_BAUD_RATE)
     write_parser.add_argument('-i', '--input', help='Input file/directory path (on local host)', default='')
     write_parser.add_argument('-o', '--output', help='Output file/directory path (on target system)\t[Default: %s]' % DEFAULT_RPATH, default=DEFAULT_RPATH)
