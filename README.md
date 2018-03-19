@@ -11,6 +11,19 @@ as pure BASH base64 encoding/decoding scripts for file transfers.
 output can appear at any time. While this does not affect the write functionality, file reads will most likely 
 fail.
 
+## Setting up
+
+Assuming you have python installed
+
+```
+# Clone this repo
+git clone git@github.com:c0mpute/serial-transfer.git ~/git/serial-transfer
+
+## Install dependencies
+sudo pip install pyserial 
+sudo pip install pyserial termcolor
+```
+
 ## Usage
 
 serial-transfer.py [-h] [-V] {write,read} ...
